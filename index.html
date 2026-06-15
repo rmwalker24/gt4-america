@@ -615,7 +615,7 @@ function showBreakdown(idx) {
       ${e.pts.slice(0, racesRun > 0 ? Math.max(racesRun, 7) : 7).map((p,i) => {
         const scored = ENTRIES.some(en => en.pts[i] > 0);
         if (!scored) return '';
-        const isBest = p === maxPts && p > 0;
+        const isBest = (IS_ENDURO[i] ? p === 50 : p === 25);
         const cls = isBest ? 'val-best' : IS_ENDURO[i] && p > 0 ? 'val-enduro' : p > 0 ? 'val-normal' : 'val-zero';
         return `<div class="pts-cell">
           <div class="pts-cell-label">${RACE_LABELS[i]}</div>
@@ -630,7 +630,7 @@ function showBreakdown(idx) {
         if (!scored) return '';
         const scale = IS_ENDURO[i] ? 50 : 25;
         const pct = Math.round((p / scale) * 100);
-        const isBest = p === maxPts && p > 0;
+        const isBest = (IS_ENDURO[i] ? p === 50 : p === 25);
         const barColor = isBest ? 'var(--red)' : IS_ENDURO[i] && p > 0 ? 'var(--navy)' : p > 0 ? '#555' : 'var(--bg3)';
         const posLabel = posFromPts(p, IS_ENDURO[i]);
         return `<div class="bar-row">
