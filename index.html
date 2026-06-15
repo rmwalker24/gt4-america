@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="GT4 America">
+<meta name="theme-color" content="#C8102E">
+<title>GT4 America – Am Class Standings 2026</title>
+
+<!-- PWA Icons via SVG data URI -->
+<link rel="apple-touch-icon" href="icon.png">
+
+<style>
+  :root {
+    --red: #C8102E;
+    --navy: #003087;
+    --silver: #A2AAAD;
+    --bg: #0f0f0f;
+    --bg2: #1a1a1a;
+    --bg3: #242424;
+    --border: rgba(255,255,255,0.08);
+    --text1: #ffffff;
+    --text2: #aaaaaa;
+    --text3: #666666;
+    --gold: #FFD700;
+    --silver-medal: #C0C0C0;
+    --bronze: #CD7F32;
+    --green: #22c55e;
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', sans-serif;
+    background: var(--bg);
+    color: var(--text1);
+    min-height: 100vh;
+    min-height: -webkit-fill-available;
+    overscroll-behavior: none;
+  }
+
+  .app {
+    max-width: 480px;
+    margin: 0 auto;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* HEADER */
+  .header {
+    background: var(--red);
+    padding: calc(var(--safe-top) + 12px) 16px 12px;
+    text-align: center;
+    position: relative;
+    flex-shrink: 0;
+  }
+
+  .header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+  }
+
+  .logo-mark {
+    display: flex;
+    align-items: baseline;
+    gap: 0px;
+  }
+
+  .logo-gt {
+    font-size: 32px;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: -2px;
+    line-height: 1;
+  }
+
+  .logo-4 {
+    font-size: 32px;
+    font-weight: 800;
+    color: var(--navy);
+    line-height: 1;
+  }
+
+  .header-text { text-align: left; }
+  .header-series { font-size: 9px; color: rgba(255,255,255,0.6); letter-spacing: 3px; font-weight: 500; text-transform: uppercase; }
+  .header-title { font-size: 18px; font-weight: 700; color: #fff; letter-spacing: 0.5px; line-height: 1.1; }
+  .header-sub { font-size: 11px; color: rgba(255,255,255,0.65); margin-top: 2px; }
+
+  .flag-strip {
+    display: flex;
+    height: 4px;
+    margin-top: 10px;
+  }
+  .flag-red { background: var(--red); flex: 1; }
+  .flag-white { background: #fff; flex: 1; }
+  .flag-blue { background: var(--navy); flex: 1; }
+
+  /* TABS */
+  .tabs {
+    display: flex;
+    background: #111;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+
+  .tab {
+    flex: 1;
+    padding: 12px 4px 10px;
+    font-size: 11px;
+    font-weight: 600;
+    text-align: center;
+    color: var(--text3);
+    cursor: pointer;
+    border: none;
+    background: transparent;
+    border-bottom: 2px solid transparent;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+    transition: color 0.15s;
+  }
+
+  .tab.active { color: #fff; border-bottom: 2px solid var(--red); }
+  .tab-icon { font-size: 16px; display: block; margin-bottom: 2px; }
+
+  /* CONTENT */
+  .tab-content { display: none; flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding-bottom: calc(var(--safe-bottom) + 20px); }
+  .tab-content.active { display: block; }
+
+  /* STANDINGS */
+  .section-header {
+    padding: 10px 16px 6px;
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text3);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    display: grid;
+    grid-template-columns: 36px 1fr 56px 52px;
+    gap: 4px;
+  }
+  .section-header .r { text-align: right; }
+
+  .entry-row {
+    display: grid;
+    grid-template-columns: 36px 1fr 56px 52px;
+    gap: 4px;
+    align-items: center;
+    padding: 11px 16px;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    transition: background 0.1s;
+    position: relative;
+  }
+  .entry-row:active { background: var(--bg3); }
+  .entry-row.bimmer { background: rgba(0,48,135,0.12); }
+  .entry-row.bimmer:active { background: rgba(0,48,135,0.2); }
+
+  .pos-wrap { display: flex; align-items: center; justify-content: center; }
+  .pos-badge {
+    width: 26px; height: 26px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700; flex-shrink: 0;
+  }
+  .p1 { background: var(--gold); color: #5a4200; }
+  .p2 { background: var(--silver-medal); color: #333; }
+  .p3 { background: var(--bronze); color: #3a1800; }
+  .pn { background: var(--bg3); color: var(--text2); }
+
+  .entry-info { min-width: 0; }
+  .entry-car {
+    font-size: 14px; font-weight: 600; color: var(--text1);
+    display: flex; align-items: center; gap: 5px;
+  }
+  .entry-team { font-size: 11px; color: var(--text2); margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+  .bmw-tag {
+    font-size: 8px; font-weight: 700; background: var(--navy);
+    color: #fff; padding: 1px 5px; border-radius: 3px; letter-spacing: 0.5px;
+  }
+  .star-tag {
+    font-size: 8px; font-weight: 700; background: var(--red);
+    color: #fff; padding: 1px 5px; border-radius: 3px;
+  }
+
+  .pts-col { text-align: right; font-size: 17px; font-weight: 700; color: var(--text1); }
+  .gap-col { text-align: right; font-size: 12px; color: var(--text2); }
+
+  /* RACES */
+  .race-card {
+    margin: 8px 12px;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .race-header-row {
+    padding: 12px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+  }
+
+  .race-left { flex: 1; min-width: 0; }
+  .race-round { font-size: 10px; font-weight: 600; color: var(--text3); letter-spacing: 1px; text-transform: uppercase; }
+  .race-venue { font-size: 14px; font-weight: 600; color: var(--text1); margin-top: 1px; }
+  .race-date { font-size: 11px; color: var(--text3); margin-top: 2px; }
+
+  .race-right { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; flex-shrink: 0; margin-left: 8px; }
+  .badge-done { background: rgba(34,197,94,0.15); color: var(--green); font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 20px; }
+  .badge-soon { background: var(--bg3); color: var(--text3); font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 20px; }
+  .chevron { font-size: 14px; color: var(--text3); transition: transform 0.2s; }
+  .chevron.open { transform: rotate(180deg); }
+
+  .race-body { display: none; border-top: 1px solid var(--border); }
+  .race-body.open { display: block; }
+
+  .session-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    text-decoration: none;
+  }
+  .session-row:last-child { border-bottom: none; }
+  .session-row:active { background: var(--bg3); }
+  .session-name { font-size: 13px; color: var(--text1); font-weight: 500; }
+  .session-win { font-size: 11px; color: var(--text2); text-align: right; max-width: 160px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .enduro-tag { display: inline-block; font-size: 8px; font-weight: 700; background: var(--navy); color: #fff; padding: 1px 4px; border-radius: 3px; margin-left: 4px; vertical-align: middle; }
+
+  .results-link {
+    display: flex; align-items: center; justify-content: center; gap: 5px;
+    padding: 10px 14px;
+    font-size: 12px; color: #60a5fa;
+    cursor: pointer;
+    border-top: 1px solid var(--border);
+    text-decoration: none;
+  }
+  .results-link:active { background: var(--bg3); }
+
+  .upcoming-msg { padding: 12px 14px; font-size: 12px; color: var(--text3); font-style: italic; }
+
+  /* BREAKDOWN */
+  .bd-list-hint { padding: 10px 16px 4px; font-size: 11px; color: var(--text3); }
+
+  .back-row {
+    display: flex; align-items: center; gap: 6px;
+    padding: 12px 16px 8px;
+    font-size: 13px; color: var(--text2);
+    cursor: pointer; border: none; background: transparent;
+    width: 100%;
+  }
+  .back-row:active { color: var(--text1); }
+
+  .bd-title-block {
+    padding: 10px 16px 12px;
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    border-top: 1px solid var(--border);
+  }
+  .bd-car { font-size: 15px; font-weight: 700; color: var(--text1); display: flex; align-items: center; gap: 6px; }
+  .bd-team { font-size: 12px; color: var(--text2); margin-top: 2px; }
+
+  .pts-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 2px;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .pts-cell { text-align: center; }
+  .pts-cell-label { font-size: 8px; color: var(--text3); margin-bottom: 3px; line-height: 1.2; }
+  .pts-cell-val { font-size: 14px; font-weight: 700; }
+  .val-best { color: var(--red); }
+  .val-enduro { color: var(--navy); }
+  .val-normal { color: var(--text1); }
+  .val-zero { color: var(--text3); }
+
+  .bars-block { padding: 12px 16px; }
+  .bar-row { display: grid; grid-template-columns: 56px 1fr 32px; gap: 8px; align-items: center; margin-bottom: 7px; }
+  .bar-label { font-size: 10px; color: var(--text3); }
+  .bar-track { background: var(--bg3); border-radius: 4px; height: 8px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 4px; transition: width 0.3s; }
+  .bar-pos { font-size: 11px; font-weight: 600; text-align: right; color: var(--text1); }
+
+  .bd-total {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 12px 16px;
+    border-top: 1px solid var(--border);
+    background: var(--bg2);
+  }
+  .bd-total-label { font-size: 13px; color: var(--text2); }
+  .bd-total-val { font-size: 20px; font-weight: 800; color: var(--text1); }
+
+  .legend { display: flex; gap: 12px; padding: 4px 16px 12px; flex-wrap: wrap; }
+  .legend-item { display: flex; align-items: center; gap: 4px; font-size: 10px; color: var(--text3); }
+  .legend-dot { width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; }
+
+  /* Divider */
+  .divider { height: 1px; background: var(--border); margin: 0; }
+
+  /* Points key card */
+  .key-card {
+    margin: 8px 12px;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px 14px;
+  }
+  .key-title { font-size: 11px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+  .key-row { display: flex; gap: 4px; flex-wrap: wrap; }
+  .key-pt { text-align: center; background: var(--bg3); border-radius: 6px; padding: 4px 6px; min-width: 34px; }
+  .key-pos { font-size: 9px; color: var(--text3); }
+  .key-val { font-size: 13px; font-weight: 700; color: var(--text1); }
+  .key-val.double { color: var(--navy); }
+
+  .last-updated { text-align: center; font-size: 10px; color: var(--text3); padding: 8px 16px 4px; }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-inner">
+      <div class="logo-mark">
+        <span class="logo-gt">GT</span><span class="logo-4">4</span>
+      </div>
+      <div class="header-text">
+        <div class="header-series">Pirelli</div>
+        <div class="header-title">AMERICA</div>
+        <div class="header-sub">2026 Am Class Standings</div>
+      </div>
+    </div>
+    <div class="flag-strip" style="margin-top:10px">
+      <div style="background:var(--red);flex:3"></div>
+      <div style="background:#fff;flex:1"></div>
+      <div style="background:var(--navy);flex:2"></div>
+    </div>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab active" onclick="showTab('standings',this)">
+      <span class="tab-icon">🏆</span>Standings
+    </button>
+    <button class="tab" onclick="showTab('races',this)">
+      <span class="tab-icon">🏁</span>Races
+    </button>
+    <button class="tab" onclick="showTab('breakdown',this)">
+      <span class="tab-icon">📊</span>Breakdown
+    </button>
+  </div>
+
+  <!-- STANDINGS TAB -->
+  <div id="tab-standings" class="tab-content active">
+    <div class="last-updated" id="last-updated-label"></div>
+    <div class="section-header">
+      <div></div>
+      <div>Car / Team</div>
+      <div class="r">Pts</div>
+      <div class="r">Gap</div>
+    </div>
+    <div id="standings-list"></div>
+  </div>
+
+  <!-- RACES TAB -->
+  <div id="tab-races" class="tab-content">
+    <div id="races-list" style="padding: 4px 0 8px"></div>
+    <div class="key-card">
+      <div class="key-title">Points Scale</div>
+      <div style="margin-bottom:6px;font-size:11px;color:var(--text2)">Sprint races (up to 60 min)</div>
+      <div class="key-row">
+        <div class="key-pt"><div class="key-pos">P1</div><div class="key-val">25</div></div>
+        <div class="key-pt"><div class="key-pos">P2</div><div class="key-val">18</div></div>
+        <div class="key-pt"><div class="key-pos">P3</div><div class="key-val">15</div></div>
+        <div class="key-pt"><div class="key-pos">P4</div><div class="key-val">12</div></div>
+        <div class="key-pt"><div class="key-pos">P5</div><div class="key-val">10</div></div>
+        <div class="key-pt"><div class="key-pos">P6</div><div class="key-val">8</div></div>
+        <div class="key-pt"><div class="key-pos">P7</div><div class="key-val">6</div></div>
+        <div class="key-pt"><div class="key-pos">P8</div><div class="key-val">4</div></div>
+        <div class="key-pt"><div class="key-pos">P9</div><div class="key-val">2</div></div>
+        <div class="key-pt"><div class="key-pos">P10</div><div class="key-val">1</div></div>
+      </div>
+      <div style="margin:10px 0 6px;font-size:11px;color:var(--navy);font-weight:600">Enduro races (2hr / 3hr) — 2× points</div>
+      <div class="key-row">
+        <div class="key-pt"><div class="key-pos">P1</div><div class="key-val double">50</div></div>
+        <div class="key-pt"><div class="key-pos">P2</div><div class="key-val double">36</div></div>
+        <div class="key-pt"><div class="key-pos">P3</div><div class="key-val double">30</div></div>
+        <div class="key-pt"><div class="key-pos">P4</div><div class="key-val double">24</div></div>
+        <div class="key-pt"><div class="key-pos">P5</div><div class="key-val double">20</div></div>
+        <div class="key-pt"><div class="key-pos">P6</div><div class="key-val double">16</div></div>
+        <div class="key-pt"><div class="key-pos">P7</div><div class="key-val double">12</div></div>
+        <div class="key-pt"><div class="key-pos">P8</div><div class="key-val double">8</div></div>
+        <div class="key-pt"><div class="key-pos">P9</div><div class="key-val double">4</div></div>
+        <div class="key-pt"><div class="key-pos">P10</div><div class="key-val double">2</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BREAKDOWN TAB -->
+  <div id="tab-breakdown" class="tab-content">
+    <div id="breakdown-view"></div>
+  </div>
+
+</div>
+
+<script>
+// ============================================================
+// DATA — update pts arrays when new race results come in
+// pts: [R1, R2, R3, R4, R5, R6, R7, R8, R9, R10, R11, R12, R13]
+// 0 = DNS / did not score
+// ============================================================
+const LAST_UPDATED = 'Through R7 · Road Atlanta · May 2026';
+
+const ENTRIES = [
+  { car:'#36',  team:'BimmerWorld Racing',        bimmer:true,  pts:[4, 2, 50,25,18,18,18, 0, 0, 0, 0, 0, 0] },
+  { car:'#21',  team:'ACI Motorsports',           bimmer:false, pts:[2,18,  4, 8,25,25,25, 0, 0, 0, 0, 0, 0] },
+  { car:'#188', team:'Random Vandals Racing',     bimmer:false, pts:[25,25,12,15,12,15, 2, 0, 0, 0, 0, 0, 0] },
+  { car:'#30',  team:'TechSport Racing',          bimmer:false, pts:[18,12,24, 4, 8, 8,15, 0, 0, 0, 0, 0, 0] },
+  { car:'#413', team:'Flying Lizard Motorsports', bimmer:false, pts:[6, 15,30,12, 4,12,10, 0, 0, 0, 0, 0, 0] },
+  { car:'#37',  team:'Dome Motorsport',           bimmer:false, pts:[15,10,20, 0, 0, 6,12, 0, 0, 0, 0, 0, 0] },
+  { car:'#72',  team:'RAFA Racing Team',          bimmer:false, pts:[0,  0, 36,18,15, 0, 0, 0, 0, 0, 0, 0, 0] },
+  { car:'#17',  team:'Rigid Speed Company',       bimmer:false, pts:[8,  6,  0,10,10,10, 8, 0, 0, 0, 0, 0, 0] },
+  { car:'#5',   team:'OGH Motorsports',           bimmer:false, pts:[12, 8, 16, 0, 0, 2, 6, 0, 0, 0, 0, 0, 0] },
+  { car:'#10',  team:'ACI Motorsports',           bimmer:false, pts:[10, 4,  8, 6, 6, 4, 4, 0, 0, 0, 0, 0, 0] },
+];
+
+const RACES = [
+  { round:'R1–R2', venue:'Sonoma Raceway', date:'March 2026', done:true,
+    url:'https://www.gt4-america.com/results/2026/sonoma-raceway',
+    sessions:[
+      { name:'Race 1', type:'sprint', url:'https://www.gt4-america.com/results/2026/sonoma-raceway/race-1', amWin:'#188 Random Vandals' },
+      { name:'Race 2', type:'sprint', url:'https://www.gt4-america.com/results/2026/sonoma-raceway/race-2', amWin:'#188 Random Vandals' },
+    ]},
+  { round:'R3', venue:'Circuit of the Americas', date:'April 2026', done:true,
+    url:'https://www.gt4-america.com/results/2026/circuit-of-the-americas',
+    sessions:[
+      { name:'Race 1', type:'enduro', url:'https://www.gt4-america.com/results/2026/circuit-of-the-americas/race-1', amWin:'#36 BimmerWorld' },
+    ]},
+  { round:'R4–R5', venue:'Sebring International Raceway', date:'April 2026', done:true,
+    url:'https://www.gt4-america.com/results/2026/sebring-international-raceway',
+    sessions:[
+      { name:'Race 1', type:'sprint', url:'https://www.gt4-america.com/results/2026/sebring-international-raceway/race-1', amWin:'#36 BimmerWorld' },
+      { name:'Race 2', type:'sprint', url:'https://www.gt4-america.com/results/2026/sebring-international-raceway/race-2', amWin:'#21 ACI Motorsports' },
+    ]},
+  { round:'R6–R7', venue:'Michelin Raceway Road Atlanta', date:'May 2026', done:true,
+    url:'https://www.gt4-america.com/results/2026/road-atlanta',
+    sessions:[
+      { name:'Race 1', type:'sprint', url:'https://www.gt4-america.com/results/2026/road-atlanta/race-1', amWin:'#21 ACI Motorsports' },
+      { name:'Race 2', type:'sprint', url:'https://www.gt4-america.com/results/2026/road-atlanta/race-2', amWin:'#21 ACI Motorsports' },
+    ]},
+  { round:'R8–R9',   venue:'Road America',                date:'June 2026',   done:false, url:'https://www.gt4-america.com/results/2026/road-america',                 sessions:[] },
+  { round:'R10–R11', venue:'Barber Motorsports Park',     date:'July 2026',   done:false, url:'https://www.gt4-america.com/results/2026/barber-motorsports-park',     sessions:[] },
+  { round:'R12–R13', venue:'Indianapolis Motor Speedway', date:'August 2026', done:false, url:'https://www.gt4-america.com/results/2026/indianapolis-motor-speedway', sessions:[] },
+];
+
+// ============================================================
+// CONSTANTS
+// ============================================================
+const RACE_LABELS = ['SOM\nR1','SOM\nR2','COTA\nR3','SEB\nR4','SEB\nR5','ATL\nR6','ATL\nR7','ROA\nR8','ROA\nR9','BAR\nR10','BAR\nR11','IMS\nR12','IMS\nR13'];
+const IS_ENDURO   = [false,false,true,false,false,false,false,false,false,false,false,false,false];
+const PTS_SPRINT  = [25,18,15,12,10,8,6,4,2,1];
+const PTS_ENDURO  = PTS_SPRINT.map(p=>p*2);
+
+// ============================================================
+// DERIVED DATA
+// ============================================================
+ENTRIES.forEach(e => e.total = e.pts.reduce((a,b)=>a+b,0));
+ENTRIES.sort((a,b) => b.total - a.total);
+const leader = ENTRIES[0].total;
+
+// ============================================================
+// HELPERS
+// ============================================================
+function posBadgeClass(i) {
+  return i===0?'p1':i===1?'p2':i===2?'p3':'pn';
+}
+
+function posFromPts(p, enduro) {
+  const scale = enduro ? PTS_ENDURO : PTS_SPRINT;
+  const idx = scale.indexOf(p);
+  return idx >= 0 ? 'P'+(idx+1) : p > 0 ? 'P?' : '—';
+}
+
+// ============================================================
+// TAB SWITCHING
+// ============================================================
+function showTab(name, btn) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tab-'+name).classList.add('active');
+  if (name === 'breakdown') showBreakdownList();
+}
+
+// ============================================================
+// STANDINGS
+// ============================================================
+function renderStandings() {
+  document.getElementById('last-updated-label').textContent = LAST_UPDATED;
+
+  document.getElementById('standings-list').innerHTML = ENTRIES.map((e,i) => {
+    const gap = i === 0 ? '—' : '−'+(leader - e.total);
+    return `
+      <div class="entry-row${e.bimmer?' bimmer':''}" onclick="showBreakdown(${i})" role="button" aria-label="${e.car} ${e.team} ${e.total} points">
+        <div class="pos-wrap"><div class="pos-badge ${posBadgeClass(i)}">${i+1}</div></div>
+        <div class="entry-info">
+          <div class="entry-car">
+            ${e.car}
+            ${e.bimmer ? '<span class="bmw-tag">BMW</span>' : ''}
+            ${i === 0 ? '<span class="star-tag">Leader</span>' : ''}
+          </div>
+          <div class="entry-team">${e.team}</div>
+        </div>
+        <div class="pts-col">${e.total}</div>
+        <div class="gap-col">${gap}</div>
+      </div>`;
+  }).join('');
+}
+
+// ============================================================
+// RACES
+// ============================================================
+function renderRaces() {
+  document.getElementById('races-list').innerHTML = RACES.map((r,i) => `
+    <div class="race-card">
+      <div class="race-header-row" onclick="toggleRace(${i})" role="button">
+        <div class="race-left">
+          <div class="race-round">${r.round}</div>
+          <div class="race-venue">${r.venue}</div>
+          <div class="race-date">${r.date}</div>
+        </div>
+        <div class="race-right">
+          <span class="${r.done?'badge-done':'badge-soon'}">${r.done?'✓ Complete':'Upcoming'}</span>
+          <span class="chevron" id="chev-${i}">▼</span>
+        </div>
+      </div>
+      <div class="race-body" id="rb-${i}">
+        ${r.done ? r.sessions.map(s => `
+          <div class="session-row" onclick="window.open('${s.url}','_blank')" role="link">
+            <span class="session-name">
+              ${s.name}
+              ${s.type==='enduro' ? '<span class="enduro-tag">ENDURO 2×</span>' : ''}
+            </span>
+            <span class="session-win">Am: ${s.amWin} ↗</span>
+          </div>`).join('') :
+          `<div class="upcoming-msg">Results not yet available</div>`
+        }
+        <a class="results-link" href="${r.url}" target="_blank" rel="noopener">
+          View on gt4-america.com ↗
+        </a>
+      </div>
+    </div>`).join('');
+}
+
+function toggleRace(i) {
+  const body = document.getElementById('rb-'+i);
+  const chev = document.getElementById('chev-'+i);
+  const open = body.classList.toggle('open');
+  chev.classList.toggle('open', open);
+}
+
+// ============================================================
+// BREAKDOWN LIST
+// ============================================================
+function showBreakdownList() {
+  document.getElementById('breakdown-view').innerHTML = `
+    <div class="bd-list-hint">Tap any car to see race-by-race breakdown</div>
+    ${ENTRIES.map((e,i) => `
+      <div class="entry-row${e.bimmer?' bimmer':''}" onclick="showBreakdown(${i})" role="button">
+        <div class="pos-wrap"><div class="pos-badge ${posBadgeClass(i)}">${i+1}</div></div>
+        <div class="entry-info">
+          <div class="entry-car">${e.car}${e.bimmer?'<span class="bmw-tag">BMW</span>':''}</div>
+          <div class="entry-team">${e.team}</div>
+        </div>
+        <div class="pts-col">${e.total}</div>
+        <div class="gap-col" style="color:var(--text3);font-size:16px">›</div>
+      </div>`).join('')}`;
+}
+
+// ============================================================
+// BREAKDOWN DETAIL
+// ============================================================
+function showBreakdown(idx) {
+  const e = ENTRIES[idx];
+  const maxPts = Math.max(...e.pts);
+  const racedCount = e.pts.filter(p=>p>0).length;
+
+  // only show races that have happened (any car scored) or this car raced
+  const totalRaces = 13;
+  const racesRun = e.pts.filter((p,i) => ENTRIES.some(en => en.pts[i] > 0)).length;
+
+  document.getElementById('breakdown-view').innerHTML = `
+    <button class="back-row" onclick="showBreakdownList()">
+      ‹ All Cars
+    </button>
+    <div class="bd-title-block">
+      <div class="bd-car">
+        ${e.car}
+        ${e.bimmer ? '<span class="bmw-tag">BMW</span>' : ''}
+      </div>
+      <div class="bd-team">${e.team}</div>
+    </div>
+
+    <div class="pts-grid">
+      ${e.pts.slice(0, racesRun > 0 ? Math.max(racesRun, 7) : 7).map((p,i) => {
+        const scored = ENTRIES.some(en => en.pts[i] > 0);
+        if (!scored) return '';
+        const isBest = p === maxPts && p > 0;
+        const cls = isBest ? 'val-best' : IS_ENDURO[i] && p > 0 ? 'val-enduro' : p > 0 ? 'val-normal' : 'val-zero';
+        return `<div class="pts-cell">
+          <div class="pts-cell-label">${RACE_LABELS[i]}</div>
+          <div class="pts-cell-val ${cls}">${p > 0 ? p : '—'}</div>
+        </div>`;
+      }).join('')}
+    </div>
+
+    <div class="bars-block">
+      ${e.pts.map((p,i) => {
+        const scored = ENTRIES.some(en => en.pts[i] > 0);
+        if (!scored) return '';
+        const scale = IS_ENDURO[i] ? 50 : 25;
+        const pct = Math.round((p / scale) * 100);
+        const isBest = p === maxPts && p > 0;
+        const barColor = isBest ? 'var(--red)' : IS_ENDURO[i] && p > 0 ? 'var(--navy)' : p > 0 ? '#555' : 'var(--bg3)';
+        const posLabel = posFromPts(p, IS_ENDURO[i]);
+        return `<div class="bar-row">
+          <div class="bar-label">${RACE_LABELS[i].replace('\\n',' ')}</div>
+          <div class="bar-track">
+            <div class="bar-fill" style="width:${pct}%;background:${barColor}"></div>
+          </div>
+          <div class="bar-pos">${posLabel}</div>
+        </div>`;
+      }).join('')}
+    </div>
+
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot" style="background:var(--red)"></div> Best result</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--navy)"></div> Enduro 2× pts</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#555"></div> Points scored</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--bg3)"></div> DNS / no pts</div>
+    </div>
+
+    <div class="bd-total">
+      <span class="bd-total-label">Total · ${racedCount} of ${totalRaces} races scored</span>
+      <span class="bd-total-val">${e.total} pts</span>
+    </div>`;
+}
+
+// ============================================================
+// INIT
+// ============================================================
+renderStandings();
+renderRaces();
+showBreakdownList();
+</script>
+</body>
+</html>
